@@ -1,38 +1,63 @@
 
-import { _decorator, Component, Node, MethodManager, Label } from 'cc';
+import { _decorator, Component, Node, Label } from 'cc';
 
 const { ccclass, property } = _decorator;
 
-/**
- * Predefined variables
- * Name = CallNative
- * DateTime = Wed Sep 01 2021 16:09:46 GMT+0800 (中国标准时间)
- * Author = Lixin2021up
- * FileBasename = callNative.ts
- * FileBasenameNoExtension = callNative
- * URL = db://assets/Script/callNative.ts
- * ManualUrl = https://docs.cocos.com/creator/3.3/manual/en/
- *
- */
+export class EventManager {
+    private methodMap: Map<String, Function>;
+    public static instance: EventManager = new EventManager;
+    public addMethod(methodName: String, f: Function): boolean {
+        if (!this.methodMap.get(methodName)) {
+            this.methodMap.set(methodName, f);
+            return true;
+        }
+        return false;
+    }
+    public applyMethod(methodName: String, arg?: String): boolean {
+        if (!this.methodMap.get(methodName)) {
+            console.log("Function not exist");
+            return false;
+        }
+        var f = this.methodMap.get(methodName);
+        try {
+            f?.call(null, arg);
+            return true;
+        } catch (e) {
+            console.log("Function trigger error: " + e);
+            return false;
+        }
+    }
+    public removeMethod(methodName: String):any{
+        return this.methodMap.delete(methodName);
+    }
+    constructor() {
+        this.methodMap = new Map<String, Function>();
+        EventManager.instance = this;
+        
+    }
+}
  
 @ccclass('CallNative')
 export class CallNative extends Component {
-    
+    //static eventMap: Map<string, Function> = new Map<string, Function>();    
     @property(Label)
     public labelListener : Label|undefined;
 
     start () {
-        this.registerAllEvent();
+        new EventManager;
+        jsb.reflection.setCallback((eventname: string, arg1: string)=>{
+            console.log("Trigger event for "+eventname+"is"+EventManager.instance.applyMethod(eventname, arg1));
+            
+        })
+        this.registerAllScriptEvent();
         this.dispatchJavaEventTest();
     }
     public dispatchJavaEventTest(){
         //Call with argument and success
-        jsb.informApp("callWithArg", "@MYSaddHello");
-        
-        
+        jsb.reflection.sendToNative("callWithArg", "@MYSaddHello");
     }
-    public registerAllEvent(){
-        MethodManager.instance.addMethod("sayHelloInJs", this.sayHelloInJs);
+    public registerAllScriptEvent(){
+        EventManager.instance.addMethod("sayHelloInJs", this.sayHelloInJs);
     }
 
     //cb
@@ -49,14 +74,3 @@ export class CallNative extends Component {
     }
     
 }
-
-/**
- * [1] Class member could be defined like this.
- * [2] Use `property` decorator if your want the member to be serializable.
- * [3] Your initialization goes here.
- * [4] Your update function goes here.
- *
- * Learn more about scripting: https://docs.cocos.com/creator/3.3/manual/en/scripting/
- * Learn more about CCClass: https://docs.cocos.com/creator/3.3/manual/en/scripting/ccclass.html
- * Learn more about life-cycle callbacks: https://docs.cocos.com/creator/3.3/manual/en/scripting/life-cycle-callbacks.html
- */

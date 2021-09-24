@@ -2112,9 +2112,8 @@
       "b": 0,
       "a": 115
     },
-    "_autoAdapt": true,
     "_pcf": 2,
-    "_bias": 0.0035,
+    "_bias": 1,
     "_near": 0.1,
     "_far": 50,
     "_aspect": 1,
@@ -2125,7 +2124,9 @@
       "x": 512,
       "y": 512
     },
-    "_saturation": 0.45098039215686275
+    "_saturation": 0.45098039215686275,
+    "_fixedArea": false,
+    "_firstSetCSM": true
   },
   {
     "__type__": "cc.SkyboxInfo",
