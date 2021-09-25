@@ -47,7 +47,6 @@ export class CallNative extends Component {
         new EventManager;
         jsb.reflection.setCallback((eventname: string, arg1: string)=>{
             console.log("Trigger event for "+eventname+"is"+EventManager.instance.applyMethod(eventname, arg1));
-            
         })
         this.registerAllScriptEvent();
         this.dispatchJavaEventTest();
@@ -57,20 +56,16 @@ export class CallNative extends Component {
         jsb.reflection.sendToNative("callWithArg", "@MYSaddHello");
     }
     public registerAllScriptEvent(){
-        EventManager.instance.addMethod("sayHelloInJs", this.sayHelloInJs);
+        EventManager.instance.addMethod("sayHelloInJs", (usr : string)=>{
+            this.sayHelloInJs(usr);
+        });
     }
 
     //cb
-    public sayHelloInJs(user: String):String {
+    public sayHelloInJs(user: string):void {
         console.log("Hello "+ user +" I'm K");
-        this.labelListener!.string = "Hello! I'm K";
-        debugger;
-        return "K";
-    }
-    public sayGoodbye(user:String):String {
-        console.log("Goodbye") ;
-        this.labelListener!.string = "Goodbye, I'm chasing my dream";
-        return "G";
-    }
-    
+        this.labelListener!.string = "Hello " + user + " ! I'm K";
+        //debugger;
+        
+    }    
 }
